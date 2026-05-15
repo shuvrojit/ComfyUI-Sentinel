@@ -3,6 +3,7 @@ import json
 import os
 import hashlib
 from pathlib import Path
+from typing import Optional
 
 
 class UsersDB:
@@ -58,15 +59,20 @@ class UsersDB:
         self.users[id] = user
         self.save_users(self.users)
 
-    def get_user(self, username: str = "", user_id: str = "") -> tuple[str, dict]:
-        """Retrieve a user by username."""
+    def get_user(
+        self, username: str = "", user_id: str = ""
+    ) -> tuple[Optional[str], dict]:
+        """Retrieve a user by username or user ID."""
         self.load_users()
 
         if user_id:
-            return user_id, self.users[user_id] or None, {}
+            user = self.users.get(user_id)
+            if not user:
+                return None, {}
+            return user_id, user
 
         for uid, user_data in self.users.items():
-            if user_data["username"] == username:
+            if user_data.get("username") == username:
                 return uid, user_data
 
         return None, {}
@@ -81,11 +87,13 @@ class UsersDB:
             password.encode("utf-8"), user_data["password"].encode("utf-8")
         )
 
-    def get_admin_user(self) -> tuple[str, dict] | None:
+    def get_admin_user(self) -> tuple[Optional[str], dict]:
         """Get the admin user from the database."""
         self.load_users()
+        self.admin_user = (None, {})
         for uid, user_data in self.users.items():
             if user_data.get("admin"):
                 self.admin_user = (uid, user_data)
+                break
 
         return self.admin_user

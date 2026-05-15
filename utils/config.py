@@ -20,6 +20,10 @@ def load_config(file_path: str) -> Dict[str, Any]:
 
 config = load_config(CONFIG_FILE)
 
+
+def get_separate_users(config: Dict[str, Any]) -> bool:
+    return config.get("separate_users", config.get("seperate_users", False))
+
 SECRET_KEY = os.getenv(config.get("secret_key_env", "SECRET_KEY"))
 
 if not SECRET_KEY:
@@ -47,7 +51,8 @@ BLACKLIST_AFTER_ATTEMPTS = config.get("blacklist_after_attempts")
 FREE_MEMORY_ON_LOGOUT = config.get("free_memory_on_logout", False)
 FORCE_HTTPS = config.get("force_https", False)
 
-SEPERATE_USERS = config.get("seperate_users", False)
+SEPARATE_USERS = get_separate_users(config)
+SEPERATE_USERS = SEPARATE_USERS
 
 MANAGER_ADMIN_ONLY = config.get("manager_admin_only", False)
 
